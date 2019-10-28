@@ -1,8 +1,15 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import urllib2
+# python 3.x
+import urllib.parse
 import urllib
+
+# python 2.x
+#import urllib2
+#import urllib
+
+# python 2.x, 3.x 공통
 import hashlib
 import hmac
 import base64
@@ -23,9 +30,17 @@ request['timestamp'] = timestamp
 request['client_id'] = client_id
 print(timestamp)
 
-request_str='&'.join(['='.join([k,urllib.quote_plus(request[k])]) for k in request.keys()])
+# python 2.x
+#message = client_id + ':' + timestamp
+#signature = hmac.new(client_secret, message, hashlib.sha256).hexdigest()
+#request_str='&'.join(['='.join([k,urllib.quote_plus(request[k])]) for k in request.keys()])
+
+# python 3.x
+message = client_id + ':' + timestamp
+signature = hmac.new(bytes(client_secret, 'utf8'), bytes(message, 'utf8'), hashlib.sha256).hexdigest()
+request_str='&'.join(['='.join([k,urllib.parse.quote_plus(request[k])]) for k in request.keys()])
+
 request_str = request_str.replace('+','%20')
-sig = hmac.new(client_secret, client_id+":"+timestamp, hashlib.sha256).hexdigest()
-req=baseurl+request_str+'&signature='+sig
+req=baseurl+request_str+'&signature='+signature
 
 print(req)
